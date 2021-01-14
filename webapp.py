@@ -1,8 +1,20 @@
 from flask import Flask
 
-app = Flask(__name__)
+from views.movies import blueprint
 
 
-@app.route("/")
-def home_page():
-    return "hello world"
+def create_app():
+    # Create DB
+
+    # Create Table
+
+    # Run Migrations
+
+    # Instantiate flask app
+    app = Flask(__name__)
+
+    # Register Blueprint
+    app.register_blueprint(blueprint)
+
+    # Return app
+    return app
