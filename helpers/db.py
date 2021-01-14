@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 
 from sqlalchemy import create_engine
-from models.base import Base
+from data_api.base import Base
 from conf.settings import config
 
 from sqlalchemy.orm import Session
