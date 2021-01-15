@@ -1,6 +1,7 @@
 from data_api.models import Movies
 from data_api.cast_dao import get_cast, add_cast
 from data_api.genre_dao import attach_movie_to_genre
+from helpers.db import enable_foreign_keys
 
 
 def movie_exists(session, name):
@@ -25,6 +26,12 @@ def add_movie(session, popularity, director, genre_list, imdb_score, name):
     for genre in genre_list:
         attach_movie_to_genre(session, movie_obj.id, genre)
 
+    session.commit()
+
+
+def delete_movie_from_db(session, movie_id):
+    enable_foreign_keys(session)
+    session.query(Movies).filter(Movies.id == movie_id).delete()
     session.commit()
 
 

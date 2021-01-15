@@ -5,7 +5,7 @@ import json
 
 from flask import Blueprint, request
 
-from data_api.movies_dao import parse_json, movie_exists, add_movie
+from data_api.movies_dao import parse_json, movie_exists, add_movie, delete_movie_from_db
 from helpers.db import terminating_sn
 from helpers.logger import LOG
 from helpers.auth import basic_auth
@@ -83,9 +83,31 @@ def edit_movies():
 @basic_auth
 def delete_movies():
     """
+    Request:
     v1/movies?id=1
-    :return: 200, For delete
-    :return: 400, For Ba
+    :param id: Required
+
+    Response:
+    :return: 200, SUCCESS for a successful deletion
+    :return: 400, BAD REQUEST for issue in client request side
+    :return: 401, UNAUTHORIZED for wrong user access
+    :return: 500, INTERNAL SERVER ERROR for issue on server side
     """
-    LOG.info(request.args.get('id'))
-    return "Delete Movies"
+    movie_id = request.args.get('id')
+
+    if not movie_id:
+        return ResponseMaker(ResponseMaker.RESPONSE_400, ResponseMaker.RESPONSE_400_MESSAGE,
+                             ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS).return_response()
+
+    try:
+        with terminating_sn() as session:
+            delete_movie_from_db(session, movie_id)
+
+            return ResponseMaker(ResponseMaker.RESPONSE_200).return_response(
+                ResponseMaker.RESPONSE_200_MESSAGE)
+
+    except Exception:
+        session.rollback()
+        LOG.exception("Exception occurred while deleting movie id {} from db".format(movie_id))
+        return ResponseMaker(ResponseMaker.RESPONSE_500).return_response(
+            ResponseMaker.RESPONSE_500_MESSAGE)

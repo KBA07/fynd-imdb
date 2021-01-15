@@ -30,3 +30,7 @@ def terminating_sn():
     finally:
         sn.close()
         sn.bind.dispose()
+
+
+def enable_foreign_keys(session):
+    session.execute('PRAGMA foreign_keys = ON')
