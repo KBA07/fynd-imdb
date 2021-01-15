@@ -74,8 +74,6 @@ class MovieGenre(Base):
     __table_args__ = (
         ForeignKeyConstraint(['movie_id'], ['movies.id'], ondelete='CASCADE' ,
                              name='movie_id_fx_key'),
-        ForeignKeyConstraint(['genre_id'], ['genres.id'], ondelete='CASCADE',
-                             name='genre_id_fx_key'),
         Index('movie_genre_id_index', 'id')
     )
 

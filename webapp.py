@@ -8,17 +8,11 @@ from views.movies import blueprint
 
 def create_app():
     # Create DB
-    logging.info("Creating DB and binding models")
-    load_db()
-
-    parser = Parser('imdb.json')
-    parser.populate()
-
-    # with terminating_sn() as session:
-    #     movie = Movies(88.8, 1, 7.1,  "haunted")
-    #     session.add(movie)
-    #     session.commit()
-    #     print(session.query(Movies).all())
+    # logging.info("Creating DB and binding models")
+    # load_db()
+    #
+    # parser = Parser('imdb.json')
+    # parser.populate()
 
     # Create Table
 
@@ -32,3 +26,8 @@ def create_app():
 
     # Return app
     return app
+
+
+if __name__ == "__main__":
+    app = create_app()
+    app.run(debug=True)

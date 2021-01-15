@@ -2,13 +2,13 @@ from contextlib import contextmanager
 
 from sqlalchemy import create_engine
 from data_api.base import Base
-from conf.settings import config
+from conf.settings import Config
 
 from sqlalchemy.orm import Session
 
 
 def get_engine():
-    return create_engine(config.SQLITE_PREFIX + config.SQLITEDB, echo=True)
+    return create_engine(Config.SQLITE_PREFIX + Config.SQLITEDB, echo=True)
 
 
 def load_db():
@@ -23,7 +23,7 @@ def session():
 
 @contextmanager
 def terminating_sn():
-    # A contextlib which closes session and db connections after use
+    # A context manager which closes session and db connections after use
     sn = session()
     try:
         yield sn

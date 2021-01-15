@@ -1,8 +1,8 @@
 import json
 
-from data_api.cast import get_cast, add_cast
-from data_api.movies import movie_exists, add_movie_to_db
-from data_api.genre import get_genre, add_genre, attach_movie_to_genre
+from data_api.cast_dao import get_cast, add_cast
+from data_api.movies_dao import movie_exists, add_movie_to_db
+from data_api.genre_dao import get_genre, add_genre, attach_movie_to_genre_db
 
 from helpers.logger import LOG
 from helpers.db import terminating_sn
@@ -40,7 +40,7 @@ class Parser(object):
             genre_obj = add_genre(session, genre_name)
             session.flush()
 
-        attach_movie_to_genre(session, movie_id, genre_obj.id)
+        attach_movie_to_genre_db(session, movie_id, genre_obj.id)
         LOG.info("Attached genre {} to movie {} ".format(genre_name, movie_id))
 
     def add_movie(self, session, popularity, director, genre_list, imdb_score, name):
