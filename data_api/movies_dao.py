@@ -3,13 +3,15 @@ from data_api.cast_dao import get_cast, add_cast
 from data_api.genre_dao import attach_movie_to_genre
 from helpers.db import enable_foreign_keys
 
+GENRE_MARKER = '$'
+
 
 def movie_exists(session, name):
     return bool(session.query(Movies.id).filter(Movies.name == name).first())
 
 
-def add_movie_to_db(session, popularity, director_id, imdb_score, name):
-    movie = Movies(popularity, director_id, imdb_score, name)
+def add_movie_to_db(session, popularity, director_id, imdb_score, name, genre_blob):
+    movie = Movies(popularity, director_id, imdb_score, name, genre_blob)
     session.add(movie)
     return movie
 
@@ -20,7 +22,8 @@ def add_movie(session, popularity, director, genre_list, imdb_score, name):
         director_obj = add_cast(session, director)
         session.flush()
 
-    movie_obj = add_movie_to_db(session, popularity, director_obj.id, imdb_score, name)
+    genre_blob = GENRE_MARKER.join(genre for genre in genre_list)
+    movie_obj = add_movie_to_db(session, popularity, director_obj.id, imdb_score, name, genre_blob)
     session.flush()
 
     for genre in genre_list:

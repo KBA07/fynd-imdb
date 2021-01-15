@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Index, ForeignKeyConstraint
-from sqlalchemy.dialects.sqlite import CHAR, REAL, INTEGER
+from sqlalchemy.dialects.sqlite import CHAR, REAL, INTEGER, TEXT
 
 from data_api.base import Base
 
@@ -11,6 +11,7 @@ class Movies(Base):
     director_id = Column(INTEGER)
     imdb_score = Column(REAL)
     name = Column(CHAR(100), unique=True)
+    genre_blob = Column(TEXT)
 
     __table_args__ = (
         ForeignKeyConstraint(['director_id'], ['cast.id'], name='director_id_fx_key'),
@@ -18,15 +19,17 @@ class Movies(Base):
         Index('name_index', 'name')
     )
 
-    def __init__(self, popularity, director_id, imdb_score, name):
+    def __init__(self, popularity, director_id, imdb_score, name, genre_blob):
         self.popularity = popularity
         self.director_id = director_id
         self.imdb_score = imdb_score
         self.name = name
+        self.genre_blob = genre_blob
 
     def __repr__(self):
-        return "Movies table Id={} Popularity={} Director ID={} Imdb Score={} Name={}".format(
-            self.id, self.popularity, self.director_id, self.imdb_score, self.name)
+        return "Movies table Id={} Popularity={} Director ID={} Imdb Score={} Name={} " \
+               "Genre Blob={}".format(self.id, self.popularity, self.director_id,
+                                      self.imdb_score, self.name, self.genre_blob)
 
 
 class Cast(Base):
