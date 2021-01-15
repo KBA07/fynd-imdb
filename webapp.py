@@ -9,10 +9,10 @@ from views.movies import blueprint
 def create_app():
     # Create DB
     # logging.info("Creating DB and binding models")
-    load_db()
+    # load_db()
     #
-    parser = Parser('imdb.json')
-    parser.populate()
+    # parser = Parser('imdb.json')
+    # parser.populate()
 
     # Create Table
 

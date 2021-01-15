@@ -15,6 +15,7 @@ class ResponseMaker(object):
 
     RESPONSE_400_ERROR_MISSING_FIELDS = 'MISSING_FIELDS'
     RESPONSE_400_ERROR_ENTRY_PRESENT = 'ENTRY_ALREADY_EXISTS'
+    RESPONSE_400_ERROR_ENTRY_MISSING = 'ENTRY_MISSING'
 
     def __init__(self, status_code, message=None, error_code=None):
         self.status_code = status_code

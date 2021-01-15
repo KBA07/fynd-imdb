@@ -25,3 +25,7 @@ def attach_movie_to_genre(session, movie_id, genre_name):
         session.flush()
 
     attach_movie_to_genre_db(session, movie_id, genre_obj.id)
+
+
+def clear_movie_genre_map(session, movie_id):
+    session.query(MovieGenre).filter(MovieGenre.movie_id == movie_id).delete()
