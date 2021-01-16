@@ -1,10 +1,9 @@
 from data_api.models import Movies, Cast, MovieGenre, Genres
 from data_api.cast_dao import CastDao
-from data_api.genre_dao import attach_movie_to_genre, clear_movie_genre_map
+from data_api.genre_dao import GenreDao
 from helpers.db import enable_foreign_keys
 
 GENRE_MARKER = '$'
-
 
 
 def get_genre_blob(genre_list):
@@ -37,7 +36,7 @@ def add_movie(session, popularity, director, genre_list, imdb_score, name):
     session.flush()
 
     for genre in genre_list:
-        attach_movie_to_genre(session, movie_obj.id, genre)
+        GenreDao.attach_movie_to_genre(session, movie_obj.id, genre)
 
     session.commit()
 
@@ -61,14 +60,14 @@ def edit_movie(session, movie_id, popularity, director, genre_list, imdb_score, 
         movie.imdb_score = imdb_score
 
     if director:
-        director_obj = check_or_add_cast(session, director)
+        director_obj = CastDao.check_or_add_cast(session, director)
         movie.director_id = director_obj.id
 
     if genre_list:
         movie.genre_blob = get_genre_blob(genre_list)
-        clear_movie_genre_map(session, movie_id)
+        GenreDao.clear_movie_genre_map(session, movie_id)
         for genre in genre_list:
-            attach_movie_to_genre(session, movie_id, genre)
+            GenreDao.attach_movie_to_genre(session, movie_id, genre)
 
     session.merge(movie)
     session.commit()
