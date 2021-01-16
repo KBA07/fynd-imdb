@@ -5,8 +5,7 @@ import json
 
 from flask import Blueprint, request
 
-from data_api.movies_dao import movie_id_exists, movie_exists, add_movie, \
-    delete_movie_from_db, edit_movie, get_movie, get_genre_list
+from data_api.movies_dao import MoviesDao
 from helpers.auth import basic_auth
 from helpers.db import terminating_sn
 from helpers.logger import LOG
@@ -81,13 +80,13 @@ def get_movies():
 
     try:
         with terminating_sn() as session:
-            total, resp = get_movie(session, name, director, genre, limit, offset)
+            total, resp = MoviesDao.get_movie(session, name, director, genre, limit, offset)
 
             movie_list = []
             for movie in resp:
                 movie_id, popularity, director, genre_blob, imdb_score, name = movie
-                movie_list.append({'id': movie_id, '99popularity': popularity,
-                                   'director': director, 'genre': get_genre_list(genre_blob),
+                movie_list.append({'id': movie_id, '99popularity': popularity, 'director': director,
+                                   'genre': MoviesDao.get_genre_list(genre_blob),
                                    'imdb_score': imdb_score, 'name': name})
 
             resp = {'total': total, 'data': movie_list}
@@ -138,13 +137,13 @@ def add_movies():
                                  ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS).return_response()
 
         with terminating_sn() as session:
-            if movie_exists(session, name):
+            if MoviesDao.movie_exists(session, name):
                 return ResponseMaker(ResponseMaker.RESPONSE_400,
                                      ResponseMaker.RESPONSE_400_MESSAGE,
                                      ResponseMaker.RESPONSE_400_ERROR_ENTRY_PRESENT
                                      ).return_response()
 
-            add_movie(session, popularity, director, genre_list, imdb_score, name)
+            MoviesDao.add_movie(session, popularity, director, genre_list, imdb_score, name)
             return ResponseMaker(ResponseMaker.RESPONSE_200).return_response(
                 ResponseMaker.RESPONSE_200_MESSAGE)
 
@@ -203,13 +202,13 @@ def edit_movies():
                                  ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS).return_response()
 
         with terminating_sn() as session:
-            if not movie_id_exists(session, movie_id):
+            if not MoviesDao.movie_id_exists(session, movie_id):
                 return ResponseMaker(ResponseMaker.RESPONSE_400,
                                      ResponseMaker.RESPONSE_400_MESSAGE,
                                      ResponseMaker.RESPONSE_400_ERROR_ENTRY_MISSING
                                      ).return_response()
 
-            edit_movie(session, movie_id, popularity, director, genre_list, imdb_score, name)
+            MoviesDao.edit_movie(session, movie_id, popularity, director, genre_list, imdb_score, name)
             return ResponseMaker(ResponseMaker.RESPONSE_200).return_response(
                 ResponseMaker.RESPONSE_200_MESSAGE)
 
@@ -244,7 +243,7 @@ def delete_movies():
 
     try:
         with terminating_sn() as session:
-            delete_movie_from_db(session, movie_id)
+            MoviesDao.delete_movie_from_db(session, movie_id)
 
             return ResponseMaker(ResponseMaker.RESPONSE_200).return_response(
                 ResponseMaker.RESPONSE_200_MESSAGE)

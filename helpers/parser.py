@@ -1,6 +1,6 @@
 import json
 
-from data_api.movies_dao import movie_exists, add_movie
+from data_api.movies_dao import MoviesDao
 
 from helpers.db import terminating_sn
 from helpers.logger import LOG
@@ -26,9 +26,10 @@ class Parser(object):
             LOG.info("Movie {} selected for write".format(name))
             try:
                 with terminating_sn() as session:
-                    if not movie_exists(session, name):
+                    if not MoviesDao.movie_exists(session, name):
                         LOG.info("Movie {} doesn't exists writting".format(name))
-                        add_movie(session, popularity, director, genre_list, imdb_score, name)
+                        MoviesDao.add_movie(
+                            session, popularity, director, genre_list, imdb_score, name)
                         session.commit()
                     else:
                         LOG.info("Movie {} exists hence skipping write".format(name))
