@@ -1,3 +1,7 @@
+"""
+A file to store all the DB Models
+"""
+
 from sqlalchemy import Column, Index, ForeignKeyConstraint
 from sqlalchemy.dialects.sqlite import CHAR, REAL, INTEGER, TEXT
 
