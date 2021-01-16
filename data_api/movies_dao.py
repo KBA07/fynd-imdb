@@ -1,5 +1,5 @@
 from data_api.models import Movies, Cast, MovieGenre, Genres
-from data_api.cast_dao import check_or_add_cast
+from data_api.cast_dao import CastDao
 from data_api.genre_dao import attach_movie_to_genre, clear_movie_genre_map
 from helpers.db import enable_foreign_keys
 
@@ -30,7 +30,7 @@ def add_movie_to_db(session, popularity, director_id, imdb_score, name, genre_bl
 
 
 def add_movie(session, popularity, director, genre_list, imdb_score, name):
-    director_obj = check_or_add_cast(session, director)
+    director_obj = CastDao.check_or_add_cast(session, director)
 
     genre_blob = get_genre_blob(genre_list)
     movie_obj = add_movie_to_db(session, popularity, director_obj.id, imdb_score, name, genre_blob)
