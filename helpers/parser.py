@@ -1,9 +1,10 @@
 import json
 
-from data_api.movies_dao import movie_exists, parse_json, add_movie
+from data_api.movies_dao import movie_exists, add_movie
 
-from helpers.logger import LOG
 from helpers.db import terminating_sn
+from helpers.logger import LOG
+from helpers.validator import Validator
 
 
 class Parser(object):
@@ -21,7 +22,7 @@ class Parser(object):
         LOG.info("Json loaded from file {}".format(self.file_location))
 
         for movie in loaded_json:
-            popularity, director, genre_list, imdb_score, name = parse_json(movie)
+            popularity, director, genre_list, imdb_score, name = Validator.parse_json(movie)
             LOG.info("Movie {} selected for write".format(name))
             try:
                 with terminating_sn() as session:

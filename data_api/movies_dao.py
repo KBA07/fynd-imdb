@@ -6,6 +6,7 @@ from helpers.db import enable_foreign_keys
 GENRE_MARKER = '$'
 
 
+
 def get_genre_blob(genre_list):
     return GENRE_MARKER.join(genre for genre in genre_list)
 
@@ -93,17 +94,3 @@ def get_movie(session, name, director, genre, limit, offset):
     resp = query.group_by(Movies.id).offset(offset).limit(limit).all()
 
     return total, resp
-
-
-def parse_json(movie_json):
-    popularity = float(movie_json.get('99popularity', 0))
-    director = movie_json.get('director', '').strip()
-    genre_list = movie_json.get('genre', [])
-    imdb_score = float(movie_json.get('imdb_score', 0))
-    name = movie_json.get('name', '').strip()
-
-    for index, value in enumerate(genre_list):
-        # Removing unnecessary spaces
-        genre_list[index] = value.strip()
-
-    return popularity, director, genre_list, imdb_score, name

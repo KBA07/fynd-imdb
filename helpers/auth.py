@@ -4,7 +4,6 @@ from flask import request
 
 from conf.settings import Config
 from helpers.response_maker import ResponseMaker
-from helpers.logger import LOG
 
 
 def enforce_auth(username, password):

@@ -5,9 +5,8 @@ import json
 
 from flask import Blueprint, request
 
-from data_api.movies_dao import parse_json, movie_id_exists, \
-    movie_exists, add_movie, delete_movie_from_db, edit_movie, get_movie, get_genre_list
-
+from data_api.movies_dao import movie_id_exists, movie_exists, add_movie, \
+    delete_movie_from_db, edit_movie, get_movie, get_genre_list
 from helpers.auth import basic_auth
 from helpers.db import terminating_sn
 from helpers.logger import LOG
@@ -19,12 +18,17 @@ blueprint = Blueprint('movies', __name__)
 
 @blueprint.route('/')
 def homepage():
+    """
+    A test API to check if flask is properly configured
+    :return:
+    """
     return "Welcome to IMDB API"
 
 
 @blueprint.route('/v1/movies', methods=['GET'])
 def get_movies():
     """
+    An API to get movies stored in the db
     Request:
     v1/movies?name=test&genre=Adventure&director=Vic&limit=100&offset=0
     :param name: optional
@@ -37,19 +41,33 @@ def get_movies():
     :return: 200, SUCCESS for a successful entry
     200 response
     {
-    "data" : [{
-    "99popularity": 83.0,
-    "director": "Victor Fleming",
-    "genre": [
-      "Adventure",
-      " Family",
-      " Fantasy",
-      " Musical"
-    ],
-    "imdb_score": 8.3,
-    "name": "The Wizard of Oz"
-    }..]
-    "total" : <int>
+    "total": 2,
+    "data": [
+        {
+            "id": 17,
+            "99popularity": 82.0,
+            "director": "Victor Fleming",
+            "genre": [
+                "Drama",
+                "Romance",
+                "War"
+            ],
+            "imdb_score": 8.2,
+            "name": "Gone with the Wind"
+        },
+        {
+            "id": 248,
+            "99popularity": 99.0,
+            "director": "Victo Fleming",
+            "genre": [
+                "Adventure",
+                "Family",
+                "Fantasy"
+            ],
+            "imdb_score": 8.3,
+            "name": "test_input1"
+        }
+    ]
     }
     :return: 500, INTERNAL SERVER ERROR for issue on server side
     """
@@ -81,12 +99,11 @@ def get_movies():
             ResponseMaker.RESPONSE_500_MESSAGE)
 
 
-
 @blueprint.route('/v1/movies', methods=['POST'])
 @basic_auth
 def add_movies():
     """
-    Endpoint for adding new movies accepts json input. ALL Fields Mandatory
+    An API for adding new movies accepts json input. ALL Fields Mandatory
     Request Body:
     {
     "99popularity": 83.0,
@@ -110,7 +127,7 @@ def add_movies():
     data = json.loads(request.data)
 
     if data:
-        popularity, director, genre_list, imdb_score, name = parse_json(data)
+        popularity, director, genre_list, imdb_score, name = Validator.parse_json(data)
 
     try:
         # Add a validation for popularity and imdb_score
@@ -145,6 +162,7 @@ def add_movies():
 @basic_auth
 def edit_movies():
     """
+    An API to edit existing movie details. Accepts id in param and all the edit fields in body.
     Request:
     v1/movies?id=1
     :param id: Required
@@ -174,7 +192,7 @@ def edit_movies():
     popularity = director = genre_list = imdb_score = name = None
     data = json.loads(request.data)
     if data:
-        popularity, director, genre_list, imdb_score, name = parse_json(data)
+        popularity, director, genre_list, imdb_score, name = Validator.parse_json(data)
 
     try:
         # Add a validation for popularity and imdb_score
@@ -207,6 +225,7 @@ def edit_movies():
 @basic_auth
 def delete_movies():
     """
+    An API to delete movies stored in db based on the id passed in param
     Request:
     v1/movies?id=1
     :param id: Required
