@@ -26,5 +26,6 @@ class ResponseMaker(object):
         resp = {'message': self.message, 'err_code': self.error_code if self.error_code else ''}
         if content:
             resp = content
-
-        return Response(json.dumps(resp), self.status_code)
+        resp = Response(json.dumps(resp), self.status_code)
+        resp.headers['Content-Type'] = 'application/json'
+        return resp
