@@ -15,6 +15,10 @@ from helpers.validator import Validator, InputOutOfBounds
 blueprint = Blueprint('movies', __name__)
 
 
+class MissingFields(Exception):
+    pass
+
+
 @blueprint.route('/')
 def homepage():
     """
@@ -126,20 +130,15 @@ def add_movies():
 
     try:
         data = json.loads(request.data)
-    except json.decoder.JSONDecodeError:
-        return ResponseMaker(ResponseMaker.RESPONSE_400, ResponseMaker.RESPONSE_400_MESSAGE,
-                             ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS).return_response()
 
-    if data:
-        popularity, director, genre_list, imdb_score, name = Validator.parse_json(data)
+        if data:
+            popularity, director, genre_list, imdb_score, name = Validator.parse_json(data)
 
-    try:
         # Add a validation for popularity and imdb_score
         Validator.validate_param(popularity, imdb_score)
 
         if not all([popularity, director, genre_list, imdb_score, name]):
-            return ResponseMaker(ResponseMaker.RESPONSE_400, ResponseMaker.RESPONSE_400_MESSAGE,
-                                 ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS).return_response()
+            raise MissingFields
 
         with terminating_sn() as session:
             if MoviesDao.movie_exists(session, name):
@@ -152,6 +151,9 @@ def add_movies():
             return ResponseMaker(ResponseMaker.RESPONSE_200).return_response(
                 ResponseMaker.RESPONSE_200_MESSAGE)
 
+    except (json.decoder.JSONDecodeError, MissingFields):
+        return ResponseMaker(ResponseMaker.RESPONSE_400, ResponseMaker.RESPONSE_400_MESSAGE,
+                             ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS).return_response()
     except InputOutOfBounds:
         return ResponseMaker(ResponseMaker.RESPONSE_400, ResponseMaker.RESPONSE_400_MESSAGE,
                              ResponseMaker.RESPONSE_400_ERROR_OUT_OF_BOUNDS).return_response()
@@ -197,20 +199,15 @@ def edit_movies():
 
     try:
         data = json.loads(request.data)
-    except json.decoder.JSONDecodeError:
-        return ResponseMaker(ResponseMaker.RESPONSE_400, ResponseMaker.RESPONSE_400_MESSAGE,
-                             ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS).return_response()
 
-    if data:
-        popularity, director, genre_list, imdb_score, name = Validator.parse_json(data)
+        if data:
+            popularity, director, genre_list, imdb_score, name = Validator.parse_json(data)
 
-    try:
         # Add a validation for popularity and imdb_score
         Validator.validate_param(popularity, imdb_score)
 
         if not movie_id or not any([popularity, director, genre_list, imdb_score, name]):
-            return ResponseMaker(ResponseMaker.RESPONSE_400, ResponseMaker.RESPONSE_400_MESSAGE,
-                                 ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS).return_response()
+            raise MissingFields
 
         with terminating_sn() as session:
             if not MoviesDao.movie_id_exists(session, movie_id):
@@ -223,6 +220,9 @@ def edit_movies():
             return ResponseMaker(ResponseMaker.RESPONSE_200).return_response(
                 ResponseMaker.RESPONSE_200_MESSAGE)
 
+    except (json.decoder.JSONDecodeError, MissingFields):
+        return ResponseMaker(ResponseMaker.RESPONSE_400, ResponseMaker.RESPONSE_400_MESSAGE,
+                             ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS).return_response()
     except InputOutOfBounds:
         return ResponseMaker(ResponseMaker.RESPONSE_400, ResponseMaker.RESPONSE_400_MESSAGE,
                              ResponseMaker.RESPONSE_400_ERROR_OUT_OF_BOUNDS).return_response()

@@ -145,7 +145,6 @@ class TestMovies(unittest.TestCase):
             self.assertEqual(ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS,
                              json.loads(response.get_data(as_text=True)).get('err_code'))
 
-
     @classmethod
     def tearDownClass(cls):
         working_dir = os.getcwd()
