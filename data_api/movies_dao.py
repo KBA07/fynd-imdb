@@ -1,3 +1,7 @@
+"""
+A data access object file to provide an interface between DB and
+it's calling function for the genre and Movies table
+"""
 from data_api.models import Movies, Cast, MovieGenre, Genres
 from data_api.cast_dao import CastDao
 from data_api.genre_dao import GenreDao
@@ -5,6 +9,9 @@ from helpers.db import enable_foreign_keys
 
 
 class MoviesDao(object):
+    """
+    A static Movies dao class to isolate Movies related functionality
+    """
 
     GENRE_MARKER = '$'
 

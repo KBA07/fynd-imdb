@@ -1,7 +1,7 @@
 # fynd-imdb
 An imdb API implementation, use user - admin, password - admin in basic auth for all POST, PUT and DELETE API calls.
 
-    A API to get movies stored in the db
+    1. A GET API to get movies stored in the db
     Request:
     GET <host>/v1/movies?name=test&genre=Adventure&director=Vic&limit=100&offset=0
     :param name: optional
@@ -44,7 +44,7 @@ An imdb API implementation, use user - admin, password - admin in basic auth for
     }
     :return: 500, INTERNAL SERVER ERROR for issue on server side
     
-    A POST API for adding new movies accepts json input. ALL Fields Mandatory
+    2. A POST API for adding new movies accepts json input. ALL Fields Mandatory
     POST <host>/v1/movies
         Request Body:
         {
@@ -65,7 +65,7 @@ An imdb API implementation, use user - admin, password - admin in basic auth for
         :return: 401, UNAUTHORIZED for wrong user access
         :return: 500, INTERNAL SERVER ERROR for issue on server side
         
-    A PUT API to edit existing movie details. Accepts id in param and all the edit fields in body.
+    3. A PUT API to edit existing movie details. Accepts id in param and all the edit fields in body.
         Request:
         PUT <host>/v1/movies?id=1
         :param id: Required
@@ -90,7 +90,7 @@ An imdb API implementation, use user - admin, password - admin in basic auth for
         :return: 401, UNAUTHORIZED for wrong user access
         :return: 500, INTERNAL SERVER ERROR for issue on server side
         
-    A DELETE API to delete movies stored in db based on the id passed in param
+    4. A DELETE API to delete movies stored in db based on the id passed in param
         Request:
         DELETE v1/movies?id=1
         :param id: Required
