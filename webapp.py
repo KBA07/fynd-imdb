@@ -1,5 +1,7 @@
 from flask import Flask
 
+# from helpers.db import load_db
+# from helpers.parser import Parser
 from views.movies import blueprint
 
 
