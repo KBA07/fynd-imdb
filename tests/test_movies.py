@@ -54,6 +54,12 @@ class TestMovies(unittest.TestCase):
                              json.loads(response.get_data(as_text=True)).get('err_code'))
 
             # Check response 400 for a missing field
+            response = client.post(self.API_URI, data=json.dumps({}), headers=self.headers)
+            self.assertEqual(ResponseMaker.RESPONSE_400, response.status_code)
+            self.assertEqual(ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS,
+                             json.loads(response.get_data(as_text=True)).get('err_code'))
+
+            # Check response 400 for a missing field
             del data['99popularity']
             response = client.post(self.API_URI, data=json.dumps(data), headers=self.headers)
             self.assertEqual(ResponseMaker.RESPONSE_400, response.status_code)
@@ -118,7 +124,7 @@ class TestMovies(unittest.TestCase):
             content = json.loads(response.get_data(as_text=True)).get('data')
             self.assertFalse(content)
 
-    def test_003_movies_put_api(self):
+    def test_003_movies_get_and_put_api(self):
         data = TestMovies.test_data.copy()
 
         with app.test_client() as client:
@@ -129,21 +135,79 @@ class TestMovies(unittest.TestCase):
             response = client.put(self.API_URI, data=json.dumps(data))
             self.assertEqual(ResponseMaker.RESPONSE_401, response.status_code)
 
-            # testing 400
+            # testing 400 missing fields by not sending movie_id
             response = client.put(self.API_URI, data=json.dumps(data), headers=self.headers)
             self.assertEqual(ResponseMaker.RESPONSE_400, response.status_code)
             self.assertEqual(ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS,
                              json.loads(response.get_data(as_text=True)).get('err_code'))
 
+            # getting the movie id by calling the get API
             response = client.get(self.API_URI, query_string={'name': data['name']})
             content = json.loads(response.get_data(as_text=True)).get('data')[0]
             self.assertTrue(content)
+            movie_id = content['id']
 
-            response = client.put(self.API_URI, query_string={'id': content['id']},
+            # testing 400 missing fields by not sending data
+            response = client.put(self.API_URI, query_string={'id': movie_id},
                                   headers=self.headers)
             self.assertEqual(ResponseMaker.RESPONSE_400, response.status_code)
             self.assertEqual(ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS,
                              json.loads(response.get_data(as_text=True)).get('err_code'))
+
+            # testing 400 by sending empty data
+            response = client.put(self.API_URI, query_string={'id': movie_id},
+                                  data=json.dumps({}), headers=self.headers)
+            self.assertEqual(ResponseMaker.RESPONSE_400, response.status_code)
+            self.assertEqual(ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS,
+                             json.loads(response.get_data(as_text=True)).get('err_code'))
+
+            # testing 400 by sending false movie_id
+            response = client.put(self.API_URI, query_string={'id': 999},
+                                  data=json.dumps(data), headers=self.headers)
+            self.assertEqual(ResponseMaker.RESPONSE_400, response.status_code)
+            self.assertEqual(ResponseMaker.RESPONSE_400_ERROR_ENTRY_MISSING,
+                             json.loads(response.get_data(as_text=True)).get('err_code'))
+
+            # testing 200 by sending for edit movies
+            name = 'check_edit_1'
+            response = client.put(self.API_URI, query_string={'id': movie_id},
+                                  data=json.dumps({'name': name}), headers=self.headers)
+            self.assertEqual(ResponseMaker.RESPONSE_200, response.status_code)
+
+            response = client.get(self.API_URI, query_string={'name': name})
+            content = json.loads(response.get_data(as_text=True)).get('data')[0]
+            self.assertEqual(movie_id, content['id'])
+
+            director = 'check_director_1'
+            response = client.put(self.API_URI, query_string={'id': movie_id},
+                                  data=json.dumps({'director': director}), headers=self.headers)
+            self.assertEqual(ResponseMaker.RESPONSE_200, response.status_code)
+
+            response = client.get(self.API_URI, query_string={'director': director})
+            content = json.loads(response.get_data(as_text=True)).get('data')[0]
+            self.assertEqual(movie_id, content['id'])
+
+            popularity = 87
+            imdb_score = 5
+            response = client.put(self.API_URI, query_string={'id': movie_id},
+                                  data=json.dumps({'99popularity': popularity,
+                                                   'imdb_score': imdb_score}),
+                                  headers=self.headers)
+            self.assertEqual(ResponseMaker.RESPONSE_200, response.status_code)
+
+            response = client.get(self.API_URI, query_string={'director': director})
+            content = json.loads(response.get_data(as_text=True)).get('data')[0]
+            self.assertEqual(popularity, content['99popularity'])
+            self.assertEqual(imdb_score, content['imdb_score'])
+
+            genre = ['Action']
+            response = client.put(self.API_URI, query_string={'id': movie_id},
+                                  data=json.dumps({'genre': genre}),
+                                  headers=self.headers)
+            self.assertEqual(ResponseMaker.RESPONSE_200, response.status_code)
+            response = client.get(self.API_URI, query_string={'genre': genre[0]})
+            content = json.loads(response.get_data(as_text=True)).get('data')[0]
+            self.assertEqual(genre, content['genre'])
 
     @classmethod
     def tearDownClass(cls):

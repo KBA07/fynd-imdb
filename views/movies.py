@@ -126,13 +126,13 @@ def add_movies():
     :return: 401, UNAUTHORIZED for wrong user access
     :return: 500, INTERNAL SERVER ERROR for issue on server side
     """
-    popularity = director = genre_list = imdb_score = name = None
-
     try:
         data = json.loads(request.data)
 
-        if data:
-            popularity, director, genre_list, imdb_score, name = Validator.parse_json(data)
+        if not data:
+            raise MissingFields
+
+        popularity, director, genre_list, imdb_score, name = Validator.parse_json(data)
 
         # Add a validation for popularity and imdb_score
         Validator.validate_param(popularity, imdb_score)
@@ -195,13 +195,13 @@ def edit_movies():
     """
     movie_id = int(request.args.get('id', 0))
 
-    popularity = director = genre_list = imdb_score = name = None
-
     try:
         data = json.loads(request.data)
 
-        if data:
-            popularity, director, genre_list, imdb_score, name = Validator.parse_json(data)
+        if not data:
+            raise MissingFields
+
+        popularity, director, genre_list, imdb_score, name = Validator.parse_json(data)
 
         # Add a validation for popularity and imdb_score
         Validator.validate_param(popularity, imdb_score)
@@ -216,7 +216,8 @@ def edit_movies():
                                      ResponseMaker.RESPONSE_400_ERROR_ENTRY_MISSING
                                      ).return_response()
 
-            MoviesDao.edit_movie(session, movie_id, popularity, director, genre_list, imdb_score, name)
+            MoviesDao.edit_movie(session, movie_id, popularity, director, genre_list, imdb_score,
+                                 name)
             return ResponseMaker(ResponseMaker.RESPONSE_200).return_response(
                 ResponseMaker.RESPONSE_200_MESSAGE)
 
