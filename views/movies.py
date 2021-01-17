@@ -31,7 +31,7 @@ def homepage():
 @blueprint.route('/v1/movies', methods=['GET'])
 def get_movies():
     """
-    An API to get movies stored in the db
+    A GET API to get movies stored in the db
     Request:
     v1/movies?name=test&genre=Adventure&director=Vic&limit=100&offset=0
     :param name: optional
