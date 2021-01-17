@@ -36,7 +36,7 @@ class TestMovies(unittest.TestCase):
         self.API_URI = "v1/movies"
 
     def test_001_movies_post_api(self):
-        data = TestMovies.test_data
+        data = TestMovies.test_data.copy()
 
         with app.test_client() as client:
             # Checking 401
@@ -87,7 +87,7 @@ class TestMovies(unittest.TestCase):
                              json.loads(response.get_data(as_text=True)).get('err_code'))
 
     def test_002_movies_delete_api(self):
-        data = TestMovies.test_data
+        data = TestMovies.test_data.copy()
 
         with app.test_client() as client:
             # Adding entry
@@ -96,7 +96,6 @@ class TestMovies(unittest.TestCase):
             # Getting added entry
             response = client.get(self.API_URI, query_string={'name': data['name']})
             content = json.loads(response.get_data(as_text=True)).get('data')[0]
-            print(content)
             self.assertTrue(content)
 
             # Checking 401
@@ -118,6 +117,34 @@ class TestMovies(unittest.TestCase):
             response = client.get(self.API_URI, query_string={'name': data['name']})
             content = json.loads(response.get_data(as_text=True)).get('data')
             self.assertFalse(content)
+
+    def test_003_movies_put_api(self):
+        data = TestMovies.test_data.copy()
+
+        with app.test_client() as client:
+            # Adding entry
+            client.post(self.API_URI, data=json.dumps(data), headers=self.headers)
+
+            # testing 401
+            response = client.put(self.API_URI, data=json.dumps(data))
+            self.assertEqual(ResponseMaker.RESPONSE_401, response.status_code)
+
+            # testing 400
+            response = client.put(self.API_URI, data=json.dumps(data), headers=self.headers)
+            self.assertEqual(ResponseMaker.RESPONSE_400, response.status_code)
+            self.assertEqual(ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS,
+                             json.loads(response.get_data(as_text=True)).get('err_code'))
+
+            response = client.get(self.API_URI, query_string={'name': data['name']})
+            content = json.loads(response.get_data(as_text=True)).get('data')[0]
+            self.assertTrue(content)
+
+            response = client.put(self.API_URI, query_string={'id': content['id']},
+                                  headers=self.headers)
+            self.assertEqual(ResponseMaker.RESPONSE_400, response.status_code)
+            self.assertEqual(ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS,
+                             json.loads(response.get_data(as_text=True)).get('err_code'))
+
 
     @classmethod
     def tearDownClass(cls):

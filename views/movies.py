@@ -123,7 +123,12 @@ def add_movies():
     :return: 500, INTERNAL SERVER ERROR for issue on server side
     """
     popularity = director = genre_list = imdb_score = name = None
-    data = json.loads(request.data)
+
+    try:
+        data = json.loads(request.data)
+    except json.decoder.JSONDecodeError:
+        return ResponseMaker(ResponseMaker.RESPONSE_400, ResponseMaker.RESPONSE_400_MESSAGE,
+                             ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS).return_response()
 
     if data:
         popularity, director, genre_list, imdb_score, name = Validator.parse_json(data)
@@ -189,7 +194,13 @@ def edit_movies():
     movie_id = int(request.args.get('id', 0))
 
     popularity = director = genre_list = imdb_score = name = None
-    data = json.loads(request.data)
+
+    try:
+        data = json.loads(request.data)
+    except json.decoder.JSONDecodeError:
+        return ResponseMaker(ResponseMaker.RESPONSE_400, ResponseMaker.RESPONSE_400_MESSAGE,
+                             ResponseMaker.RESPONSE_400_ERROR_MISSING_FIELDS).return_response()
+
     if data:
         popularity, director, genre_list, imdb_score, name = Validator.parse_json(data)
 
